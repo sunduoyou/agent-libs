@@ -88,7 +88,6 @@ or GPL2.txt for full copies of the license.
 #include "udig_inf.h"
 #endif /* UDIG */
 
-#include "ppm_version.h"
 #include "ppm_ringbuffer.h"
 #include "ppm_events_public.h"
 #include "ppm_events.h"
@@ -5214,7 +5213,6 @@ int f_tcp_rcv_established_e(struct event_filler_arguments *args){
 	u32 saddr = 0;
 	u32 daddr = 0;
 	u16 family = 0;
-	u32 srtt = 0;
 
 	int res;
 	int size;
@@ -5223,12 +5221,7 @@ int f_tcp_rcv_established_e(struct event_filler_arguments *args){
 	struct sock *sk = args->sk;
 	const struct inet_sock *inet = inet_sk(sk);
 	struct tcp_sock *ts = tcp_sk(sk);
-	
-#if ((PPM_RHEL_RELEASE_CODE > 0 && PPM_RHEL_RELEASE_CODE >= PPM_RHEL_RELEASE_VERSION(7, 2)) || LINUX_VERSION_CODE >= KERNEL_VERSION(3, 15, 0))
-	srtt = ts->srtt_us >> 3;
-#else 
-	srtt = ts->srtt >> 3;
-#endif
+	u32 srtt = ts->srtt_us >> 3;
 
 	sport = ntohs(inet->inet_sport);
 	dport = ntohs(inet->inet_dport);

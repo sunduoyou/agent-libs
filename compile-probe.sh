@@ -15,39 +15,18 @@ DIR=`pwd`
 if [ ! -d $DST  ];then
   mkdir $DST
 fi
-
-compilerBpfFun(){
-	cd bpf
-	make KERNELDIR=$src
-	mv probe.o $DIR/$DST/$version.o
-	make KERNELDIR=$src clean
-}
-
-for version in `ls /usr/src/kernels`
+for version in `ls /lib/modules/`
 do
 	cd $DIR/driver
 	echo Compile probe for $version
-	src=/usr/src/kernels/$version/
+	src=/lib/modules/$version/build
 	# compile kernel modules
 	make KERNELDIR=$src
 	mv $PROBE_NAME.ko $DIR/$DST/$version.ko
 	make KERNELDIR=$src clean
-	echo "$version"
-        array=(${version//./ })
-	if [ ${array[0]} -ge 4 ] && [ ${array[1]} -ge 14 ]; then
-		compilerBpfFun
-	fi
-        if [ ${array[0]} -eq 3 ] && [ ${array[1]} -eq 10 ] && [ ${array[2]} == "0-957" ]; then
-                compilerBpfFun
-        fi
-        if [ ${array[0]} -eq 3 ] && [ ${array[1]} -eq 10 ] && [ ${array[2]} == "0-1062" ]; then
-                compilerBpfFun
-        fi
-        if [ ${array[0]} -eq 3 ] && [ ${array[1]} -eq 10 ] && [ ${array[2]} == "0-1127" ]; then
-                compilerBpfFun
-        fi
-        if [ ${array[0]} -eq 3 ] && [ ${array[1]} -eq 10 ] && [ ${array[2]} == "0-1160" ]; then
-                compilerBpfFun
-        fi
-
+	# compile bpf modules
+	cd bpf
+	make KERNELDIR=$src
+	mv probe.o $DIR/$DST/$version.o
+	make KERNELDIR=$src clean
 done
